@@ -1,0 +1,108 @@
+/**
+ * @fileoverview
+ * @author Taketoshi Aono
+ */
+
+const _                  = require('lodash');
+const fs                 = require('fs');
+const gulp               = require('gulp');
+const path               = require('path');
+const tsc                = require('gulp-typescript');
+const build              = require('./plugins/build');
+const del                = require('del');
+const sourcemaps         = require('gulp-sourcemaps');
+const express            = require('express');
+const bodyParser         = require('body-parser');
+const https              = require('https');
+
+const connect            = require('connect');
+const serveStatic        = require('serve-static');
+
+
+const DIST = 'app';
+const BIN_DIR = path.resolve(process.cwd(), './node_modules/.bin/') + '/';
+const GITHUB_AUTH = '';
+
+const certOptions = {
+  cert: fs.readFileSync('./certs/server.crt'),
+  key: fs.readFileSync('./certs/server.key')
+};
+
+if (GITHUB_AUTH && !process.env.JSPM_GITHUB_AUTH_TOKEN) {
+  process.env.JSPM_GITHUB_AUTH_TOKEN = GITHUB_AUTH;
+}
+
+
+gulp.task('serve', done => {
+const app = express();
+  const serve = serveStatic('./');
+  app.use(serve);
+  app.use(bodyParser.json());
+  app.post('/count', (req, res) => {
+    res.send(req.body);
+  });
+  https.createServer(certOptions, app).listen(8989);
+});
+
+
+
+/**
+ * Install other dependencies.
+ */
+gulp.task('install', done => {
+  exec(`${BIN_DIR}jspm install`, () => {
+    process.chdir('src');
+    if (!fs.existsSync('typings')) {
+      exec(`${BIN_DIR}typings install`, done);
+    }
+  });
+});
+
+
+/**
+ * Compile typescript.
+ */
+gulp.task('typescript', () => {  
+  return gulp.src(['src/**/*', '_references.ts', '!src/typings/main.d.ts', '!src/typings/main/**/*'])
+    .pipe(tsc(tsc.createProject('tsconfig.json', {
+      typescript: require('typescript')
+    })))
+    .pipe(gulp.dest('lib/'));
+});
+
+
+/**
+ * Minify javascript.
+ */
+gulp.task('minify', ['typescript'], () => {
+  return gulp.src('lib/main.js')
+    .pipe(build({
+      configFile: "jspm.config.js",
+      build: {
+        minify: true,
+        sourceMaps: false,
+        mangle: true,
+        browser: true,
+        globalDefs: {
+          DEBUG: false
+        }
+      }
+    }))
+    .pipe(gulp.dest(`${DIST}/`));
+});
+
+
+gulp.task( 'copy-html', () => {
+  return gulp.src('./index.html')
+    .pipe(gulp.dest(`${DIST}`));
+});
+
+
+/**
+ * Rm tmp files
+ */
+gulp.task('clean', (cb) => del([DIST, 'ts'], cb));
+
+
+gulp.task('build', ['minify', 'copy-html']);
+gulp.task('default', ['build']);

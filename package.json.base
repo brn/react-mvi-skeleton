@@ -1,0 +1,9 @@
+{
+  "name": "<%= project.name %>",
+  "version": "<%= project.version %>",
+  "description": "<%= project.description %>",
+  "main": "index.tsx",
+  "scripts": {},
+  "author": "<%= project.author %>",
+  "license": "<%= project.license %>"
+}

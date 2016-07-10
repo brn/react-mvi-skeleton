@@ -1,0 +1,38 @@
+SystemJS.config({
+  paths: {
+    "npm:": "jspm_packages/npm/",
+    "<%= project.name %>": "src/"
+  },
+  devConfig: {
+    "map": {
+      "plugin-babel": "npm:systemjs-plugin-babel@0.0.12"
+    }
+  },
+  transpiler: "ts",
+  typescriptOptions: {
+    "tsconfig": true,
+    "typeCheck": false
+  },
+  packages: {
+    "<%= project.name %>": {
+      "main": "index.tsx"
+    },
+    "src": {
+      "defaultExtension": "tsx",
+      "meta": {
+        "*.tsx": {
+          "loader": "ts"
+        }
+      }
+    }
+  }
+});
+
+SystemJS.config({
+  packageConfigPaths: [
+    "npm:@*/*.json",
+    "npm:*.json"
+  ],
+  map: {},
+  packages: {}
+});

@@ -1,0 +1,31 @@
+{
+  "name": "@react-mvi/skelton",
+  "bin": {
+    "rmvi": "rmvi"
+  },
+  "version": "0.0.1",
+  "description": "Create project skelton of react-mvi",
+  "main": "index.js",
+  "scripts": {
+    "compile": "babel src --out-dir lib -p es2015 --source-maps-inline --plugins transform-regenerator",
+    "test": "npm run compile && node lib/test.js",
+    "pretest": "npm run compile",
+    "prepublish": "npm run compile"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.9.0",
+    "ejs": "^2.4.2",
+    "fs-extra": "^0.30.0"
+  },
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-compile": "^2.0.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-register": "^6.9.0",
+    "babel-cli": "^6.10.1",
+    "babel-plugin-transform-regenerator": "^6.9.0",
+    "babel-polyfill": "^6.9.1"
+  }
+}

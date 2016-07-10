@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * @fileoverview
+ * @author Taketoshi Aono
+ */
+
+
+var program = require('commander');
+var fs = require('fs-extra');
+
+var VERSION = JSON.parse(fs.readFileSync(__dirname + '/package.json', 'utf8')).version;
+
+program.version(VERSION)
+  .command('init', 'Init project.', {isDefault: true})
+  .parse(process.argv);
